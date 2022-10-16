@@ -1,1 +1,1 @@
-# battleship_webserver
+# battleship_service
