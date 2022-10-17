@@ -3,7 +3,6 @@ import { addPlayerToGame, createGame, getGame } from '../../services/database';
 import config from '../../config/config.json';
 import { randomUUID } from 'crypto';
 import { GameServiceType } from './types';
-import { GameDAO } from '../../services/database/types';
 
 const gameRoutes = Router();
 
@@ -37,7 +36,7 @@ gameRoutes.get('/join/:gameId', (req, res) => {
         res.status(400).end();
     }
 
-    getGame(gameId, (error: unknown, game: GameDAO | null) => {
+    getGame(gameId, (error: unknown, game: GameServiceType | null) => {
         if (error !== null || !game) {
             res.status(400).end();
             return;
