@@ -37,9 +37,10 @@ gameRoutes.get('/join/:gameId', (req, res) => {
         res.status(400).end();
     }
 
-    getGame(gameId, (game: GameDAO | null) => {
+    getGame(gameId, (error: unknown, game: GameDAO | null) => {
         if (error !== null || !game) {
-            return res.status(400).end();
+            res.status(400).end();
+            return;
         }
         const players = game.players.split(',');
         console.log(players.length)

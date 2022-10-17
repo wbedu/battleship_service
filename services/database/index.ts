@@ -49,7 +49,7 @@ const createGame = (
 
 const getGame = (
     gameId: string,
-    callback: (game: GameDAO | null) => undefined
+    callback: (error: unknown, game: GameDAO | null) => void
 ) => getGameStmt.get([gameId], callback);
 
 const addPlayerToGame = (
