@@ -105,3 +105,6 @@ dist
 
 # sqlite db
 *.sqlite
+
+# build
+build/
