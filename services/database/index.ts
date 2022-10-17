@@ -5,7 +5,13 @@ import { GameDAO } from './types'
 
 
 db.serialize(() => {
-    db.run('CREATE TABLE IF NOT EXISTS game (id STRING PRIMARY KEY, turn INTEGER, players string);');
+    db.run(`
+    CREATE TABLE IF NOT EXISTS game(
+        id STRING PRIMARY KEY,
+        turn INTEGER,
+        players string
+    );`);
+   
     db.run(`
     CREATE TABLE IF NOT EXISTS player(
         id STRING PRIMARY KEY,
