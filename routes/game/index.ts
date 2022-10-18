@@ -11,16 +11,17 @@ gameRoutes.get('/', (_req, res) => {
 })
 
 gameRoutes.get('/new', (_req, res) => {
-    const player1Id = randomUUID();
+    const playerId = randomUUID();
     const gameId = randomUUID();
     const turn = (Math.floor(Math.random() * 10) % 2) + 1;
-    createGame(player1Id, gameId, turn, (result: any) => {
+    createGame(playerId, gameId, turn, (result: any) => {
         if (result !== null) {
             throw (new Error(result));
         } else {
             res.json({
                 url: `${config.PROTOCOL}://${config.HOSTNAME}:${config.PORT}/game/join/${gameId}`,
                 gameId,
+                playerId,
                 turn,
             })
         }
