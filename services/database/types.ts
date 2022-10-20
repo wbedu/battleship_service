@@ -4,6 +4,13 @@ type GameDAO = {
     players: string,
 }
 
+type PlayerDAO = {
+    id: string,
+    gameId: string,
+    board: string
+}
+
 export {
-    GameDAO
+    GameDAO,
+    PlayerDAO,
 }

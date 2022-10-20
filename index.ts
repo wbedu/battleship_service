@@ -1,9 +1,10 @@
 // Import the express in typescript file
 import express from 'express';
-import config from './config/config.json'
-
+import config from './config/config.json';
+import bodyParser from 'body-parser';
 //routes
 import gameRoutes from './routes/game';
+import moveRoutes from './routes/move'
 
 // Initialize the express engine
 const app: express.Application = express();
@@ -21,4 +22,6 @@ app.listen(port, () => {
          http://localhost:${port}/`);
 });
 
+app.use(bodyParser.json());
 app.use('/game', gameRoutes)
+app.use('/move', moveRoutes)

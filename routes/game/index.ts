@@ -39,7 +39,7 @@ gameRoutes.get('/join/:gameId', (req, res) => {
 
     getGame(gameId, (error: unknown, game: GameServiceType | null) => {
         if (error !== null || !game) {
-            res.status(400).end();
+            res.status(400).end('cannot find game');
             return;
         }
         const players = game.players.split(',');
@@ -50,7 +50,7 @@ gameRoutes.get('/join/:gameId', (req, res) => {
             addPlayerToGame(gameId, players.join(','), (error: unknown) => {
                 console.log(players.join('here,'));
                 if (error !== null) {
-                    res.status(500).end();
+                    res.status(500).end('cannot add player to game');
                     return;
                 } else {
                     res.json({
@@ -62,7 +62,7 @@ gameRoutes.get('/join/:gameId', (req, res) => {
                 }
             });
         } else {
-            res.status(400).end();
+            res.status(400).end('too many players in game');
         }
     })
 
