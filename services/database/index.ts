@@ -36,9 +36,9 @@ const createGame = (
     callback: (error: unknown | null) => void
 ) => {
     try {
-
+        const players = JSON.stringify([player1Id]);
         db.serialize(() => {
-            createGameStmt.run([gameId, turn, player1Id])
+            createGameStmt.run([gameId, turn, players])
             createPlayerStmt.run([player1Id, gameId, undefined])
         })
     }
@@ -62,10 +62,27 @@ const getGame = (
 
 const addPlayerToGame = (
     gameId: string,
-    playerId: string,
+    players: string[],
     callback: (error: unknown) => void,
-) => addPlayerStmt.run(playerId, gameId, callback);
-
+) => {
+    try {
+        db.serialize(() => {
+            createPlayerStmt.run([players[1], gameId, undefined])
+            addPlayerStmt.run(JSON.stringify(players), gameId);
+        })
+    }
+    catch (error: unknown) {
+        console.error(error);
+        if (callback) {
+            return callback(error);
+        } else {
+            throw error
+        }
+    }
+    if (callback) {
+        return callback(null);
+    }
+}
 const getBoard = (
     playerId: string,
     gameId: string,

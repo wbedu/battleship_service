@@ -4,7 +4,6 @@ const validateBaord = (board: string[][]) => {
         || board.filter(
             (tileSet) => (tileSet.length != 10)).length !== 0
     ) {
-        console.log(board.length)
         return false;
     }
 

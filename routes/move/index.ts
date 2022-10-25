@@ -16,6 +16,7 @@ gameRoutes.post('/setBoard/:gameId', (req, res) => {
                 board,
                 playerId,
                 gameId,
+                expected: ['body: board', 'param: gameId', 'header: User-Id',]
             }
         }).end('');
         return;
@@ -27,7 +28,8 @@ gameRoutes.post('/setBoard/:gameId', (req, res) => {
             return;
         }
 
-        const players = game.players.split(',');
+        const players = JSON.parse(game.players);
+
         if (!players.includes(playerId)) {
             res.status(400).end('player does not have access');
             return;
@@ -37,12 +39,18 @@ gameRoutes.post('/setBoard/:gameId', (req, res) => {
             res.status(400).end('invalid board');
             return;
         }
-
         getBoard(playerId, gameId, (error: unknown, row: PlayerDAO | null) => {
+            console.table(row);
             if (error) {
                 res.status(500).end('invalid board');
                 return;
             }
+
+            if (!row) {
+                res.status(500).end('invalid player');
+                return;
+            }
+            console.log("board", row?.board)
             if (row?.board) {
 
                 res.status(400).json({
@@ -52,17 +60,17 @@ gameRoutes.post('/setBoard/:gameId', (req, res) => {
                 });
                 return;
             } else {
-                setBoard(playerId, boardMtxtoText(board), (error: unknown) => {
+                
+                setBoard(playerId, boardMtxtoText(board), (error) => {
                     if (error) {
-                        res.status(500).end();
+                        res.status(500).end((error as Error).message);
                         return;
                     }
-                    res.status(200).end();
+                    res.status(200).end("added board");
                     return;
                 });
             }
         })
-
     });
 });
 
