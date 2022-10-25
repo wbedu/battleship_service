@@ -43,7 +43,7 @@ gameRoutes.get('/stat/:gameId', (req, res) => {
             return;
         }
         console.table(game)
-        const players:string[] = JSON.parse(game.players);
+        const players: string[] = JSON.parse(game.players);
         if (!players.includes(userId)) {
             res.status(401).end('You are not a player in this game');
             return;
@@ -116,7 +116,6 @@ gameRoutes.get('/join/:gameId', (req, res) => {
             res.status(400).end('too many players in game');
         }
     })
-
 })
 
 export default gameRoutes;
