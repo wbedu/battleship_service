@@ -19,7 +19,7 @@ gameRoutes.get('/new', (_req, res) => {
             throw (new Error(result));
         } else {
             res.json({
-                url: `${config.PROTOCOL}://${config.HOSTNAME}:${config.PORT}/game/join/${gameId}`,
+                url: `${config.PROTOCOL}://${config.HOSTNAME}:${config.HTTP_PORT}/game/join/${gameId}`,
                 gameId,
                 playerId,
                 turn,
@@ -95,7 +95,6 @@ gameRoutes.get('/join/:gameId', (req, res) => {
             res.status(400).end('cannot find game');
             return;
         }
-        console.log(game.players)
         const players = JSON.parse(game.players)
         if (players.length === 1) {
             players.push(userId);
