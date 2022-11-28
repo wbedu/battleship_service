@@ -1,36 +1,79 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { randomUUID } from "crypto";
-import { WebSocketServer, WebSocket } from "ws"
+import { WebSocket } from "ws"
 import { boardMtxtoText, validateBaord } from "../../util/board";
-import { createGame, getBoard, getGame, setBoard } from "../database";
+import { addPlayersToGame, createGame, getBoard, getGame, NewGameObject, setBoard } from "../database";
 import { GameDAO, PlayerDAO } from "../database/types";
 
-const handleCreateGame = (ws: WebSocket, message: any) => {
-    if (message.type == 'create_game') {
+type playerQueueObject = {
+    playerId: string,
+    ws: WebSocket,
+}
+
+type InPlayObject = {
+    gameId: string
+    turn: number,   
+    players: playerQueueObject[]
+};
+
+
+const inPlay: InPlayObject[] = [];
+const playerQueue: playerQueueObject[] = [];
+
+const handleJoinGame = (ws: WebSocket, message: any) => {
+    if (message.type == 'join_game') {
         const playerId = randomUUID();
-        const gameId = randomUUID();
-        const turn = (Math.floor(Math.random() * 10) % 2) + 1;
-        createGame(playerId, gameId, turn, (result: any) => {
-            if (result !== null) {
-                console.log(result)
-                ws.send(JSON.stringify({
-                    type: "failure",
-                    payload: {
-                        message: "failed to create game",
-                    },
-                }));
-            } else {
-                ws.send(JSON.stringify({
-                    type: "created_game",
-                    payload: {
-                        playerId,
-                        gameId,
-                        turn
-                    },
-                }));
-            }
-        })
+        playerQueue.push({ playerId, ws });
+
+        if (playerQueue.length === 2) {
+            const player1 = playerQueue.shift() as playerQueueObject;
+            const player2 = playerQueue.shift() as playerQueueObject;
+            const players = [player1, player2];
+            const playerIds = players.map((player) => player.playerId)
+
+            createGame((createError, newGame) => {
+
+                try {
+                    if (createError) {
+                        throw createError;
+                    }
+                    const { gameId, turn } = newGame as NewGameObject;
+                    addPlayersToGame(gameId as string, playerIds, ((addError) => {
+                        if (addError) {
+                            throw addError;
+                        }
+                        inPlay.push({
+                            players,
+                            gameId,
+                            turn,
+                        })
+                        players.forEach((player) => {
+                            player.ws.send(JSON.stringify({
+                                type: "created_game",
+                                payload: {
+                                    playerId: player.playerId,
+                                    gameId,
+                                    turn,
+                                },
+                            }));
+                        });
+                    }))
+                } catch (error) {
+                    console.error(error)
+                    players.forEach((player) => {
+                        player.ws.send(JSON.stringify({
+                            type: "failure",
+                            payload: {
+                                message: "failed to create game",
+                            },
+                        }));
+                    })
+                }
+            });
+        }
     }
 }
+
 
 const HandleSetBoard = (ws: WebSocket, message: any) => {
     const { playerId, gameId, board } = message
@@ -132,6 +175,6 @@ const HandleSetBoard = (ws: WebSocket, message: any) => {
 }
 
 export {
-    handleCreateGame,
+    handleJoinGame,
     HandleSetBoard,
 }

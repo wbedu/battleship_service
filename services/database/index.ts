@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Database } from 'sqlite3';
 
 const db = new Database('./database.sqlite');
@@ -22,37 +23,35 @@ db.serialize(() => {
 });
 
 // Prepared Statements
-const createGameStmt = db.prepare('INSERT INTO game(id, turn, players) VALUES (?,?,?)');
+const createGameStmt = db.prepare('INSERT INTO game(id, turn) VALUES (?,?)');
 const getGameStmt = db.prepare("SELECT * from game where id = ?");
 const addPlayerStmt = db.prepare('UPDATE game SET players = ? WHERE id = ?');
 const setBoardStmt = db.prepare("UPDATE player SET board = ? where id = ?");
 const getPlayerBoardStmt = db.prepare('Select board from player where id = ? and gameId = ?');
 const createPlayerStmt = db.prepare('INSERT INTO player VALUES(?,?,?)');
 
-const createGame = (
-    player1Id: string,
+export type NewGameObject = {
     gameId: string,
     turn: number,
-    callback: (error: unknown | null) => void
+}
+
+const createGame = (
+    callback: ((error: null | unknown, gameId: NewGameObject | null) => void)
 ) => {
+    const gameId = randomUUID();
+    const turn = 1; // TODO randomly generate
     try {
-        const players = JSON.stringify([player1Id]);
         db.serialize(() => {
-            createGameStmt.run([gameId, turn, players])
-            createPlayerStmt.run([player1Id, gameId, undefined])
+            createGameStmt.run([gameId, turn])
         })
     }
     catch (error: unknown) {
-        console.error(error);
-        if (callback) {
-            return callback(error);
-        } else {
-            throw error
-        }
+        return callback(error, null);
     }
-    if (callback) {
-        return callback(null);
-    }
+    return callback(null, {
+        gameId,
+        turn,
+    });
 }
 
 const getGame = (
@@ -60,14 +59,14 @@ const getGame = (
     callback: (error: unknown, game: GameDAO | null) => void
 ) => getGameStmt.get([gameId], callback);
 
-const addPlayerToGame = (
+const addPlayersToGame = (
     gameId: string,
     players: string[],
     callback: (error: unknown) => void,
 ) => {
     try {
         db.serialize(() => {
-            createPlayerStmt.run([players[1], gameId, undefined])
+            players.forEach((player) => createPlayerStmt.run([player, gameId, undefined]));
             addPlayerStmt.run(JSON.stringify(players), gameId);
         })
     }
@@ -98,7 +97,7 @@ const setBoard = (
 export {
     createGame,
     getGame,
-    addPlayerToGame,
+    addPlayersToGame,
     setBoard,
     getBoard,
 }

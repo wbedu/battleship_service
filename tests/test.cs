@@ -19,7 +19,7 @@ class CreatedGameMessage
     public string type { get; set; }
 
     public CreatedGame payload { get; set; }
-}
+}   
 
 class GameSocketMessage
 {
