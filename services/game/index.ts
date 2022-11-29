@@ -128,6 +128,7 @@ const HandleFire = (ws: WebSocket, message: any) => {
     }));
 
     if (status === 'win') {
+        game.players.forEach((player) => player.ws.close());
         const gameIndex = inPlay.findIndex((curGame) => curGame.gameId != game.gameId);
         inPlay.splice(gameIndex, 1);
     }
