@@ -110,7 +110,7 @@ const HandleFire = (ws: WebSocket, message: any) => {
             status = 'hit';
         }
     }
-
+    console.log(`fire at ${targetPlayer.playerId} (pos) ${status}`);
     targetPlayer.ws.send(JSON.stringify({
         type: "enemy_attack",
         payload: {
@@ -119,6 +119,8 @@ const HandleFire = (ws: WebSocket, message: any) => {
             turn: game.turn
         },
     }));
+
+    console.log(`send attack_results`);
     ws.send(JSON.stringify({
         type: "attack_result",
         payload: {
@@ -132,7 +134,6 @@ const HandleFire = (ws: WebSocket, message: any) => {
         const gameIndex = inPlay.findIndex((curGame) => curGame.gameId != game.gameId);
         inPlay.splice(gameIndex, 1);
     }
-
 }
 
 export {
