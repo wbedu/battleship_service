@@ -2,9 +2,7 @@
 import express from 'express';
 import { WebSocketServer } from 'ws';
 import config from './config/config.json';
-// import gameRoutes from './routes/game';
-// import moveRoutes from './routes/move'
-import { handleJoinGame, HandleSetBoard } from './services/game';
+import { HandleFire, handleJoinGame, handleSetShip } from './services/game';
 
 // Initialize the express engine
 const app: express.Application = express();
@@ -30,7 +28,7 @@ const socketPort: number = config.SOCKET_PORT ?? 8082;
 const wss = new WebSocketServer({ port: socketPort });
 
 wss.on('connection', (ws) => {
-    console.log(ws, 'connected');
+    console.log('connected');
     ws.on('error', console.error);
     ws.on('message', (data) => {
         let message: any;
@@ -47,26 +45,31 @@ wss.on('connection', (ws) => {
             }));
             return;
         }
-        switch (message.type) {
-            case 'join_game':
-                handleJoinGame(ws, message);
-                break;
-            case 'set_board':
-                HandleSetBoard(ws, message);
-                break;
-            case 'fire':
-                console.log(message);
-                break;
-            default:
-                // eslint-disable-next-line no-case-declarations
-                const errorMsg = `unknown message type ${message?.type}`
-                console.error(errorMsg);
-                ws.send(JSON.stringify({
-                    type: "failure",
-                    payload: {
-                        message: errorMsg
-                    }
-                }));
+
+        try {
+            switch (message.type) {
+                case 'join_game':
+                    handleJoinGame(ws, message);
+                    break;
+                case 'set_ship':
+                    handleSetShip(ws, message);
+                    break;
+                case 'fire':
+                    HandleFire(ws, message);
+                    break;
+                default:
+                    // eslint-disable-next-line no-case-declarations
+                    throw new Error(`unknown message type ${message?.type}`);
+
+            }
+        } catch (error: any) {
+            console.error(error);
+            ws.send(JSON.stringify({
+                type: "failure",
+                payload: {
+                    message: error.message ?? error,
+                }
+            }));
         }
 
     });

@@ -1,4 +1,4 @@
-const validateBaord = (board: string[][]) => {
+const validateBoard = (board: string[][]) => {
     if (
         board.length !== 10
         || board.filter(
@@ -14,9 +14,8 @@ const boardTextToMtx = JSON.parse
 
 const boardMtxtoText = JSON.stringify
 
-
 export {
-    validateBaord,
+    validateBoard,
     boardTextToMtx,
     boardMtxtoText,
 };
