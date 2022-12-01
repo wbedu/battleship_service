@@ -35,6 +35,22 @@ const isGameOver = (ships: number[][]) => ships.every(ship => ship.every((pos) =
 
 const startGame = (players: playerQueueObject[]) => {
     const gameId = randomUUID();
+    players[0].ws.on('close', () => {
+        if (players[1].ws.OPEN) {
+            players[1].ws.close();
+        }
+        const gameIndex = inPlay.findIndex((curGame) => curGame.gameId != gameId);
+        inPlay.splice(gameIndex, 1);
+    });
+
+    players[1].ws.on('close', () => {
+        if (players[0].ws.OPEN) {
+            players[0].ws.close();
+        }
+        const gameIndex = inPlay.findIndex((curGame) => curGame.gameId != gameId);
+        inPlay.splice(gameIndex, 1);
+    });
+
     inPlay.push({
         players,
         gameId,
