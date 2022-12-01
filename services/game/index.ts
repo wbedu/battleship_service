@@ -123,7 +123,7 @@ const HandleFire = (ws: WebSocket, message: any) => {
             status = 'hit';
         }
     }
-    console.log(`fire at ${targetPlayer.playerId} (pos) ${status}`);
+    console.log(`fire at ${targetPlayer.playerId} pos:${pos} ${status}`);
     targetPlayer.ws.send(JSON.stringify({
         type: "enemy_attack",
         payload: {

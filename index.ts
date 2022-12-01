@@ -1,24 +1,7 @@
 // Import the express in typescript file
-import express from 'express';
 import { WebSocketServer } from 'ws';
 import config from './config/config.json';
 import { HandleFire, handleJoinGame, handleSetShip } from './services/game';
-
-// Initialize the express engine
-const app: express.Application = express();
-// Take a port 3000 for running server.
-const httpPort: number = config.HTTP_PORT ?? 8081;
-
-// Handling '/' Request
-app.get('/', (_req, _res) => {
-    _res.send("TypeScript With Express");
-});
-
-// Server setup
-app.listen(httpPort, () => {
-    console.log(`TypeScript with Express
-         http://localhost:${httpPort}/`);
-});
 
 /**********
 **sockets**
